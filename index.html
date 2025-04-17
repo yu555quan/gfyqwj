@@ -57,34 +57,39 @@
             color: #555;
             line-height: 1.6;
         }
-        .qq-group {
+        .login-container {
             text-align: center;
-            margin: 20px 0;
+            margin-top: 50px;
         }
-        .qq-group a {
+        .login-form {
             display: inline-block;
-            padding: 10px 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .login-form input[type="text"], .login-form input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .login-form input[type="submit"] {
+            width: 100%;
+            padding: 10px;
             background-color: #2E8B57;
             color: white;
-            text-decoration: none;
+            border: none;
             border-radius: 5px;
+            cursor: pointer;
         }
-        .qq-group a:hover {
+        .login-form input[type="submit"]:hover {
             background-color: #226633;
         }
-        /* 新增样式 */
-        .introduction-list {
-            list-style-type: none;
-            padding: 0;
-        }
-        .introduction-list li {
-            background-color: #e0f7fa;
-            border: 1px solid #b2ebf2;
-            margin-bottom: 10px;
-            padding: 15px;
-            border-radius: 5px;
-            font-size: 1.1em;
-            color: #00698f;
+        .message {
+            color: red;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -94,103 +99,101 @@
         <a href="#rules">群聊规则</a>
         <a href="#ban-issues">封号问题处理</a>
         <a href="#letter">给绿色玩家的一封信</a>
-        <!-- 可以根据需要继续添加更多导航链接 -->
-    </div>
-    
-     <!-- 新增最新QQ官方群聊部分 -->
-    <div class="qq-group">
-        <a href="mqqapi://card/show_pslcard?src_type=internal&version=1&uin=1037159969&card_type=group&source=qrcode" target="_blank">点击加入QQ群：1037159969</a>
     </div>
 
-    <div class="container">
+    <div class="login-container">
+        <form class="login-form" onsubmit="return validateLogin()">
+            <h2>登录</h2>
+            <p>您的用户名就是在文件群的名字。</p>
+            <input type="text" id="username" placeholder="请输入您的用户名" required>
+            <input type="password" id="password" placeholder="yyh666" required>
+            <input type="submit" value="登录">
+        </form>
+        <p id="message" class="message"></p>
+    </div>
+
+    <div class="container" id="content" style="display:none;">
         <div class="title">遇强文件官方网页</div>
         <div class="description">在这里，我们用技术定义未来，用文件连接世界</div>
-    </div>
 
-    <div class="container section" id="introduction">
-        <h2>介绍群聊</h2>
-        <ul class="introduction-list">
-            <li>🌟 <strong>技术领先：</strong>我们拥有顶尖的技术团队，随时为你提供最新、最全的游戏文件。</li>
-            <li>🎮 <strong>游戏无忧：</strong>无论是经典怀旧游戏，还是最新潮流大作，我们都能迅速响应，满足你的需求。</li>
-            <li>🤝 <strong>社区支持：</strong>加入我们，你将进入一个充满激情与活力的社区，与其他玩家交流心得，分享经验。</li>
-            <li>🛡️ <strong>安全保障：</strong>我们致力于打造一个高效、便捷、安全的游戏文件分享环境。</li>
-            <li>🎉 <strong>独家体验：</strong>第一时间获取热门游戏的独家文件，解锁更多隐藏玩法，提升你的游戏水平。</li>
-            <li>🚀 <strong>快速响应：</strong>我们的团队会及时处理你的问题，确保你始终享受最佳的游戏体验。</li>
-        </ul>
-        <p>
-            遇强文件，为你而强。我们期待你的加入，一起开启精彩的游戏之旅！
-        </p>
-    </div>
+        <div class="container section" id="introduction">
+            <h2>介绍群聊</h2>
+            <ul>
+                <li>🌟 <strong>技术领先：</strong>我们拥有顶尖的技术团队，随时为你提供最新、最全的游戏文件。</li>
+                <li>🎮 <strong>游戏无忧：</strong>无论是经典怀旧游戏，还是最新潮流大作，我们都能迅速响应，满足你的需求。</li>
+                <li>🤝 <strong>社区支持：</strong>加入我们，你将进入一个充满激情与活力的社区，与其他玩家交流心得，分享经验。</li>
+                <li>🛡️ <strong>安全保障：</strong>我们致力于打造一个高效、便捷、安全的游戏文件分享环境。</li>
+                <li>🎉 <strong>独家体验：</strong>第一时间获取热门游戏的独家文件，解锁更多隐藏玩法，提升你的游戏水平。</li>
+                <li>🚀 <strong>快速响应：</strong>我们的团队会及时处理你的问题，确保你始终享受最佳的游戏体验。</li>
+            </ul>
+            <p>
+                遇强文件，为你而强。我们期待你的加入，一起开启精彩的游戏之旅！
+            </p>
+        </div>
 
-    <div class="container section" id="rules">
-        <h2>群聊规则</h2>
-        <p>
-            为了营造一个和谐、有序的交流环境，确保每一位群成员都能享受到愉快的体验，我们特制定以下群聊规则。请所有成员务必遵守，共同维护群聊的良好秩序。
-        </p>
-        <ol>
-            <li><strong>禁止辱骂与人身攻击：</strong>群内严禁使用任何形式的侮辱性语言或进行人身攻击。尊重他人是基本的社交准则，任何恶意攻击他人的行为都将受到严肃处理。</li>
-            <li><strong>禁止刷屏：</strong>请勿在群内连续发送大量重复信息或无关内容，以免干扰其他成员的正常交流。如有重要信息需要分享，请确保内容简洁明了。</li>
-            <li><strong>禁止发布违规内容：</strong>严禁在群内传播色情、暴力、恐怖等违法或不道德的内容，以及任何违反国家法律法规的信息。</li>
-            <li><strong>禁止广告与恶意推广：</strong>未经管理员许可，禁止在群内发布任何形式的广告、推广链接或进行恶意营销行为。</li>
-            <li><strong>尊重知识产权：</strong>请勿在群内传播未经授权的盗版软件、游戏文件或其他侵犯知识产权的内容。</li>
-            <li><strong>遵守群管理规定：</strong>请服从管理员的管理，积极配合群规的执行。对于违反群规的行为，管理员有权进行警告、禁言或移出群聊等处理。</li>
-            <li><strong>保持友好交流：</strong>我们鼓励群成员之间友好交流、互相帮助，共同营造一个积极向上的社区氛围。</li>
-        </ol>
-        <p>
-            加入遇强文件群聊，即视为同意遵守以上规则。我们相信，通过大家的共同努力，我们的群聊将变得更加美好！
-        </p>
-    </div>
+        <div class="container section" id="rules">
+            <h2>群聊规则</h2>
+            <p>
+                为了营造一个和谐、有序的交流环境，确保每一位群成员都能享受到愉快的体验，我们特制定以下群聊规则。请所有成员务必遵守，共同维护群聊的良好秩序。
+            </p>
+            <ol>
+                <li><strong>禁止辱骂与人身攻击：</strong>群内严禁使用任何形式的侮辱性语言或进行人身攻击。尊重他人是基本的社交准则，任何恶意攻击他人的行为都将受到严肃处理。</li>
+                <li><strong>禁止刷屏：</strong>请勿在群内连续发送大量重复信息或无关内容，以免干扰其他成员的正常交流。如有重要信息需要分享，请确保内容简洁明了。</li>
+                <li><strong>禁止发布违规内容：</strong>严禁在群内传播色情、暴力、恐怖等违法或不道德的内容，以及任何违反国家法律法规的信息。</li>
+                <li><strong>禁止广告与恶意推广：</strong>未经管理员许可，禁止在群内发布任何形式的广告、推广链接或进行恶意营销行为。</li>
+                <li><strong>尊重知识产权：</strong>请勿在群内传播未经授权的盗版软件、游戏文件或其他侵犯知识产权的内容。</li>
+                <li><strong>遵守群管理规定：</strong>请服从管理员的管理，积极配合群规的执行。对于违反群规的行为，管理员有权进行警告、禁言或移出群聊等处理。</li>
+                <li><strong>保持友好交流：</strong>我们鼓励群成员之间友好交流、互相帮助，共同营造一个积极向上的社区氛围。</li>
+            </ol>
+            <p>
+                加入遇强文件群聊，即视为同意遵守以上规则。我们相信，通过大家的共同努力，我们的群聊将变得更加美好！
+            </p>
+        </div>
 
-    <div class="container section" id="ban-issues">
-        <h2>封号问题处理</h2>
-        <p>
-            对于你遇到的封号问题，我们感到非常痛心。如果是因为使用了我们的文件导致封号，我们强烈建议你按照以下步骤提供相关信息，我们将全力为你解决问题。
-        </p>
-        <h3>需要提供的信息</h3>
-        <ol>
-            <li>使用的外挂名称</li>
-            <li>进入最后一把游戏的战绩截图和视频</li>
-            <li>导入文件的完整视频</li>
-            <li>封号的截图</li>
-        </ol>
-        <p>
-            请将上述信息一一回复给售后客服，以便我们进行核实。
-        </p>
+        <div class="container section" id="ban-issues">
+            <h2>封号问题处理</h2>
+            <p>
+                对于你遇到的封号问题，我们感到非常痛心。如果是因为使用了我们的文件导致封号，我们强烈建议你按照以下步骤提供相关信息，我们将全力为你解决问题。
+            </p>
+            <h3>需要提供的信息</h3>
+            <ol>
+                <li>使用的外挂名称</li>
+                <li>进入最后一把游戏的战绩截图和视频</li>
+                <li>导入文件的完整视频</li>
+                <li>封号的截图</li>
+            </ol>
+            <p>
+                请将上述信息一一回复给售后客服，以便我们进行核实。
+            </p>
 
-        <h3>如果问题出在我们</h3>
-        <ol>
-            <li>我们会尽力协助更改，并允许赔偿。</li>
-            <li>我们会提醒开发团队尽快更新文件，避免类似问题再次发生。</li>
-        </ol>
-        <p>
-            请注意，一旦选择赔偿或更新，将不可更换，因此请谨慎选择。
-        </p>
+            <h3>如果问题出在我们</h3>
+            <ol>
+                <li>我们会尽力协助更改，并允许赔偿。</li>
+                <li>我们会提醒开发团队尽快更新文件，避免类似问题再次发生。</li>
+            </ol>
+            <p>
+                请注意，一旦选择赔偿或更新，将不可更换，因此请谨慎选择。
+            </p>
 
-        <h3>如果问题出在你</h3>
-        <p>
-            如果经售后核对，封号问题是因为你的操作不当，我们将协助沟通，并给出以下建议：
-        </p>
-        <ol>
-            <li>即使有防封措施，也要适当“演”一下，避免过于明显的作弊行为。</li>
-            <li>避免过于夸张的操作，比如“百米腰射”等容易引起怀疑的行为。</li>
-            <li>不要使用过老的文件，因为它们可能已经不再安全。</li>
-            <li>确保每一个文件都正确导入，避免因操作失误导致封号。</li>
-            <li>如果封号时间较短（如10分钟），很可能是你的操作过于激进，建议适当“演”一下。</li>
-        </ol>
-        <p>
-            最后，我们欢迎你继续使用遇强文件，并友情提醒以下内容：
-        </p>
-        <ul>
-            <li>文件群需要提升活跃度，但不能骂人、刷屏。</li>
-            <li>我们一般过了十二点就结束处理售后问题。</li>
-            <li>单文件单人使用，如果传播，一经发现，永久拉黑。</li>
-        </ul>
-        <p>
-            买文件，找遇强，有保障，文件稳，私小开发，售后有保障，服务态度好！
-        </p>
-    </div>
-
-    <div class="container section" id="letter">
+            <h3>如果问题出在你</h3>
+            <p>
+                如果经售后核对，封号问题是因为你的操作不当，我们将协助沟通，并给出以下建议：
+            </p>
+            <ol>
+                <li>即使有防封措施，也要适当“演”一下，避免过于明显的作弊行为。</li>
+                <li>避免过于夸张的操作，比如“百米腰射”等容易引起怀疑的行为。</li>
+                <li>不要使用过老的文件，因为它们可能已经不再安全。</li>
+                <li>确保每一个文件都正确导入，避免因操作失误导致封号。</li>
+                <li>如果封号时间较短（如10分钟），很可能是你的操作过于激进，建议适当“演”一下。</li>
+            </ol>
+            <p>
+                最后，我们欢迎你继续使用遇强文件，并友情提醒以下内容：
+            </p>
+            <ul>
+                <li>文件群需要提升活跃度，但不能骂人、刷屏。</li>
+                <li>我们一般过了十二点就结束处理售后问题。</li>
+                <li>单文件单人使用，  
+                  <div class="container section" id="letter">
         <h2>给绿色玩家的一封信</h2>
         <p>
             致所有绿色玩家一封信：
@@ -234,5 +237,35 @@
             没人嘲笑你。<br>
         </p>
     </div>
-</body>
-</html>\
+</div>
+
+<script>
+    function validateLogin() {
+        const validUsernames = [
+            "诚信赢天下", "123fa78", "打压所有圈子", "感觉至上", "空白", "探花", "专注售后",
+            "爱里寻欢", "爱慕", "阿瑞", "安枫", "baller", "贝贝", "Brooooooo!", "别说话别说话",
+            "不起名字", "博泽", "Di忆冬", "淡然", "fire in the hole", "个涵", "辉", "行川",
+            "花海", "涵涵也会伤感.", "黑名单", "谎言", "极镜", "l", "墨", "Man", "密码",
+            "念神", "逆天了老铁", "??", "😎✌", "^O^", "₍₍⁽◍⁾₎₍⁽◍⁾₎", "💰", "va.4e6.等你",
+            "❤️💕💕", "。。", "🐱", "😏👌", "😔", "😃", "😎", "🤔", "😈", "😼", "🐸", "🌵",
+            "😳", "😈", "??", "😎👌", "^O^", "月月", "一只不要被动...", "自爆(敢过来可...",
+            "终究不可能", "治愈系", "小川.", "小cat久揍模式", "许馆", "小皮", "小帅",
+            "小透明", "薛霞", "嘻嘻嘻", "小郁", "宇", "守望着你", "孙小喘", "甜甜呀",
+            "荒", "雾起", "wwue", "X", "潇🌹", "小安", "phonk", "柒", "七.", "秦岭维何",
+            "Re.", "染回归号", "Serein", "死枪6", "商微"
+        ];
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const message = document.getElementById('message');
+        const content = document.getElementById('content');
+
+        if (validUsernames.includes(username) && password === 'yyh666') {
+            content.style.display = 'block';
+            message.textContent = '登录成功！欢迎进入遇强文件官方网页。';
+        } else {
+            message.textContent = '用户名或密码错误。如果您没有用户名或密码，请联系3870149287。';
+            return false; // 阻止表单提交
+        }
+        return true; // 允许表单提交
+    }
+</script>
