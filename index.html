@@ -173,7 +173,7 @@
                 <li>使用的外挂名称</li>
                 <li>进入最后一把游戏的战绩截图和视频</li>
                 <li>导入文件的完整视频</li>
-                <li>封号的截图（必须要）</li>
+                <li>封号的截图</li>
             </ol>
             <p>
                 请将上述信息一一回复给售后客服，以便我们进行核实。
@@ -325,7 +325,16 @@
                 "小透明", "薛霞", "嘻嘻嘻", "小郁", "宇", "守望着你", "孙小喘", "甜甜呀",
                 "荒", "雾起", "wwue", "X", "潇🌹", "小安", "phonk", "柒", "七.", "秦岭维何",
                 "Re.", "染回归号", "Serein", "死枪6", "商微",
-                "出书&", "和故", "故不叫故", "有你", "倏符"
+                "出书&", "和故", "故不叫故", "有你", "倏符",
+                "流星雨", "星辰大海", "幻影行者", "暗夜精灵", "风之子",
+                "火凤凰", "冰霜巨龙", "雷霆之怒", "光明使者", "暗影刺客",
+                "守护者", "流浪者", "猎人", "法师", "战士",
+                "骑士", "牧师", "德鲁伊", "术士", "圣骑士",
+                "潜行者", "工程师", "药师", "猎魔人", "龙骑士",
+                "影舞者", "星术师", "月之女祭司", "太阳神官", "暗月之影",
+                "雷霆之心", "冰风谷", "火焰山", "翡翠梦", "黄金之翼",
+                "白银之刃", "黑曜石", "红莲业火", "青龙偃月", "白虎啸月",
+                "朱雀焚天", "玄武守卫", "麒麟之角", "凤凰涅槃", "神龙之息"
             ];
 
             const username = document.getElementById('username').value;
@@ -334,9 +343,24 @@
             const content = document.getElementById('content');
             const logoutBtn = document.querySelector('.logout-btn');
 
-            if (validUsernames.includes(username) && password === 'yyh666') {
+            if (validUsernames.includes(username) && (password === 'yyh666' || password === 'yuquan')) {
                 if (isLoggedIn) {
                     message.textContent = '您已登录，请先登出再登录其他账号。';
+                    return false;
+                }
+
+                // 检查是否输入了重置密码
+                if (password === 'yuquan') {
+                    // 重置设备的登录状态
+                    localStorage.removeItem('currentUsername');
+                    message.textContent = '设备已重置，可以登录新账号。';
+                    return false;
+                }
+
+                // 检查设备上是否已登录其他账号
+                const currentUsername = localStorage.getItem('currentUsername');
+                if (currentUsername && currentUsername !== username) {
+                    message.textContent = '此设备已登录其他账号，请先登出或使用重置密码“yuquan”重置设备。';
                     return false;
                 }
 
@@ -354,6 +378,9 @@
                     return false;
                 }
 
+                // 存储当前登录的用户名
+                localStorage.setItem('currentUsername', username);
+
                 // 存储设备指纹并登录
                 storeDeviceFingerprint(username);
                 isLoggedIn = true;
@@ -370,6 +397,7 @@
         function logout() {
             const username = document.getElementById('username').value;
             localStorage.removeItem(`fingerprint_${username}`);
+            localStorage.removeItem('currentUsername');
             isLoggedIn = false;
             document.getElementById('content').style.display = 'none';
             document.getElementById('message').textContent = '已登出。';
@@ -377,4 +405,4 @@
         }
     </script>
 </body>
-            </html>
+    </html>
