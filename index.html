@@ -91,9 +91,6 @@
             color: red;
             margin-top: 10px;
         }
-        .captcha-container {
-            margin: 10px 0;
-        }
         .logout-btn {
             margin-top: 20px;
             padding: 10px 20px;
@@ -122,11 +119,6 @@
             <p>您的用户名就是在文件群的名字。</p>
             <input type="text" id="username" placeholder="请输入您的用户名" required>
             <input type="password" id="password" placeholder="yyh666" required>
-            <div class="captcha-container">
-                <p>请输入验证码：</p>
-                <input type="text" id="captcha" placeholder="验证码" required>
-                <span id="captcha-display"></span>
-            </div>
             <input type="submit" value="登录">
         </form>
         <p id="message" class="message"></p>
@@ -269,9 +261,8 @@
             const browserInfo = navigator.userAgent;
             const screenResolution = `${window.screen.width}x${window.screen.height}`;
             const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            const ipAddress = localStorage.getItem('ipAddress'); // 假设IP地址已存储
             const language = navigator.language;
-            return `${browserInfo}-${screenResolution}-${timezone}-${ipAddress}-${language}`;
+            return `${browserInfo}-${screenResolution}-${timezone}-${language}`;
         }
 
         function validateDeviceFingerprint(username) {
@@ -285,18 +276,105 @@
             localStorage.setItem(`fingerprint_${username}`, fingerprint);
         }
 
-        // 验证码生成和验证
-        function generateCaptcha() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let captcha = '';
-            for (let i = 0; i < 6; i++) {
-                captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+        // 地理位置验证
+        function getGeolocation() {
+            return new Promise((resolve, reject) => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        position => {
+                            resolve({
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude
+                            });
+                        },
+                        error => {
+                            reject(error);
+                        }
+                    );
+                } else {
+                    reject(new Error("Geolocation is not supported by this browser."));
+                }
+            });
+        }
+
+        function validateGeolocation() {
+            try {
+                const { latitude, longitude } = getGeolocation();
+                // 这里可以添加地理位置验证逻辑，例如检查是否在允许的范围内
+                console.log(`Geolocation: ${latitude}, ${longitude}`);
+                return true;
+            } catch (error) {
+                console.error("Geolocation validation failed:", error);
+                return false;
             }
-            return captcha;
         }
 
-        function validateCaptcha(userInput, captcha) {
-            return userInput.toLowerCase() === captcha.toLowerCase();
+        // 登录状态管理
+        let isLoggedIn = false;
+
+        function validateLogin() {
+            const validUsernames = [
+                "诚信赢天下", "123fa78", "打压所有圈子", "感觉至上", "空白", "探花", "专注售后",
+                "爱里寻欢", "爱慕", "阿瑞", "安枫", "baller", "贝贝", "Brooooooo!", "别说话别说话",
+                "不起名字", "博泽", "Di忆冬", "淡然", "fire in the hole", "个涵", "辉", "行川",
+                "花海", "涵涵也会伤感.", "黑名单", "谎言", "极镜", "l", "墨", "Man", "密码",
+                "念神", "逆天了老铁", "??", "😎✌", "^O^", "₍₍⁽◍⁾₎₍⁽◍⁾₎", "💰", "va.4e6.等你",
+                "❤️💕💕", "。。", "🐱", "😏👌", "😔", "😃", "😎", "🤔", "😈", "😼", "🐸", "🌵",
+                "😳", "😈", "??", "😎👌", "^O^", "月月", "一只不要被动...", "自爆(敢过来可...",
+                "终究不可能", "治愈系", "小川.", "小cat久揍模式", "许馆", "小皮", "小帅",
+                "小透明", "薛霞", "嘻嘻嘻", "小郁", "宇", "守望着你", "孙小喘", "甜甜呀",
+                "荒", "雾起", "wwue", "X", "潇🌹", "小安", "phonk", "柒", "七.", "秦岭维何",
+                "Re.", "染回归号", "Serein", "死枪6", "商微",
+                "出书&", "和故", "故不叫故", "有你", "倏符"
+            ];
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const message = document.getElementById('message');
+            const content = document.getElementById('content');
+            const logoutBtn = document.querySelector('.logout-btn');
+
+            if (validUsernames.includes(username) && password === 'yyh666') {
+                if (isLoggedIn) {
+                    message.textContent = '您已登录，请先登出再登录其他账号。';
+                    return false;
+                }
+
+                // 验证地理位置
+                const isLocationValid = validateGeolocation();
+                if (!isLocationValid) {
+                    message.textContent = '地理位置验证失败，请确保您的位置在允许的范围内。';
+                    return false;
+                }
+
+                // 验证设备指纹
+                const isValidDevice = validateDeviceFingerprint(username);
+                if (!isValidDevice) {
+                    message.textContent = '此账号已在其他设备上登录，请在原设备上登录。';
+                    return false;
+                }
+
+                // 存储设备指纹并登录
+                storeDeviceFingerprint(username);
+                isLoggedIn = true;
+                content.style.display = 'block';
+                message.textContent = '登录成功！欢迎进入遇强文件官方网页。';
+                logoutBtn.style.display = 'block';
+            } else {
+                message.textContent = '用户名或密码错误。如果您没有用户名或密码，请联系3870149287。';
+                return false;
+            }
+            return true;
         }
 
-       
+        function logout() {
+            const username = document.getElementById('username').value;
+            localStorage.removeItem(`fingerprint_${username}`);
+            isLoggedIn = false;
+            document.getElementById('content').style.display = 'none';
+            document.getElementById('message').textContent = '已登出。';
+            document.querySelector('.logout-btn').style.display = 'none';
+        }
+    </script>
+</body>
+            </html>
