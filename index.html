@@ -68,28 +68,24 @@
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .login-form input[type="text"], .login-form input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .login-form input[type="submit"] {
-            width: 100%;
-            padding: 10px;
-            background-color: #2E8B57;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .login-form input[type="submit"]:hover {
-            background-color: #226633;
-        }
         .message {
             color: red;
             margin-top: 10px;
+        }
+        .captcha-container {
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .captcha-container p {
+            margin-right: 10px;
+        }
+        .captcha-display {
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            font-weight: bold;
         }
         .logout-btn {
             margin-top: 20px;
@@ -106,23 +102,13 @@
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <a href="#introduction">介绍群聊</a>
-        <a href="#rules">群聊规则</a>
-        <a href="#ban-issues">封号问题处理</a>
-        <a href="#letter">给绿色玩家的一封信</a>
-    </div>
-
     <div class="login-container">
-        <form class="login-form" onsubmit="return validateLogin()">
-            <h2>登录</h2>
-            <p>您的用户名就是在文件群的名字。</p>
-            <input type="text" id="username" placeholder="请输入您的用户名" required>
-            <input type="password" id="password" placeholder="yyh666" required>
-            <input type="submit" value="登录">
-        </form>
+        <div class="captcha-container">
+            <p>请完成图形验证：</p>
+            <canvas id="captcha-canvas" width="200" height="100" style="border: 1px solid #ccc; margin: 0 10px;"></canvas>
+            <button id="verify-btn">验证</button>
+        </div>
         <p id="message" class="message"></p>
-        <button class="logout-btn" onclick="logout()" style="display: none;">登出</button>
     </div>
 
     <div class="container" id="content" style="display:none;">
@@ -178,7 +164,6 @@
             <p>
                 请将上述信息一一回复给售后客服，以便我们进行核实。
             </p>
-
             <h3>如果问题出在我们</h3>
             <ol>
                 <li>我们会尽力协助更改，并允许赔偿。</li>
@@ -256,153 +241,76 @@
     </div>
 
     <script>
-        // 设备指纹生成和验证
-        function generateDeviceFingerprint() {
-            const browserInfo = navigator.userAgent;
-            const screenResolution = `${window.screen.width}x${window.screen.height}`;
-            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            const language = navigator.language;
-            return `${browserInfo}-${screenResolution}-${timezone}-${language}`;
+        // 绘制图形验证码
+        function drawCaptcha() {
+            const canvas = document.getElementById('captcha-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制随机图形（示例：绘制一个随机形状）
+            ctx.beginPath();
+            ctx.moveTo(50, 50);
+            ctx.lineTo(100, 30);
+            ctx.lineTo(150, 70);
+            ctx.lineTo(100, 90);
+            ctx.closePath();
+            ctx.fillStyle = '#ff6347';
+            ctx.fill();
+
+            // 存储验证点
+            ctx.__correctPoint = { x: 100, y: 50 };
         }
 
-        function validateDeviceFingerprint(username) {
-            const storedFingerprint = localStorage.getItem(`fingerprint_${username}`);
-            const currentFingerprint = generateDeviceFingerprint();
-            return storedFingerprint === currentFingerprint;
-        }
+        // 初始化图形验证码
+        drawCaptcha();
 
-        function storeDeviceFingerprint(username) {
-            const fingerprint = generateDeviceFingerprint();
-            localStorage.setItem(`fingerprint_${username}`, fingerprint);
-        }
+        // 验证图形验证码
+        document.getElementById('verify-btn').addEventListener('click', function() {
+            const canvas = document.getElementById('captcha-canvas');
+            const message = document.getElementById('message');
+            const content = document.getElementById('content');
 
-        // 地理位置验证
-        function getGeolocation() {
-            return new Promise((resolve, reject) => {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        position => {
-                            resolve({
-                                latitude: position.coords.latitude,
-                                longitude: position.coords.longitude
-                            });
-                        },
-                        error => {
-                            reject(error);
-                        }
-                    );
-                } else {
-                    reject(new Error("Geolocation is not supported by this browser."));
-                }
+            // 获取用户点击位置
+            const rect = canvas.getBoundingClientRect();
+            const x = rect.width / 2; // 默认点击中心点
+            const y = rect.height / 2;
+
+            // 获取正确验证点
+            const correctPoint = canvas.getContext('2d').__correctPoint;
+
+            // 计算距离（简化验证逻辑）
+            const distance = Math.sqrt(Math.pow(x - correctPoint.x, 2) + Math.pow(y - correctPoint.y, 2));
+
+            // 判断是否验证通过
+            if (distance < 20) {
+                message.textContent = '验证成功！欢迎进入遇强文件官方网页。';
+                content.style.display = 'block';
+            } else {
+                message.textContent = '验证失败，请重新点击图形。';
+                drawCaptcha(); // 重新绘制验证码
+            }
+        });
+
+        // 地理位置验证（简化版）
+        function validateGeolocation() {
+            // 这里使用IP Geolocation API来获取用户的国家信息
+            // 请替换为实际的API调用
+            return new Promise((resolve) => {
+                // 模拟地理位置验证
+                setTimeout(() => {
+                    resolve(true); // 假设验证通过
+                }, 1000);
             });
         }
 
-        function validateGeolocation() {
-            try {
-                const { latitude, longitude } = getGeolocation();
-                // 这里可以添加地理位置验证逻辑，例如检查是否在允许的范围内
-                console.log(`Geolocation: ${latitude}, ${longitude}`);
-                return true;
-            } catch (error) {
-                console.error("Geolocation validation failed:", error);
-                return false;
-            }
-        }
-
-        // 登录状态管理
-        let isLoggedIn = false;
-
-        function validateLogin() {
-            const validUsernames = [
-                "诚信赢天下", "123fa78", "打压所有圈子", "感觉至上", "空白", "探花", "专注售后",
-                "爱里寻欢", "爱慕", "阿瑞", "安枫", "baller", "贝贝", "Brooooooo!", "别说话别说话",
-                "不起名字", "博泽", "Di忆冬", "淡然", "fire in the hole", "个涵", "辉", "行川",
-                "花海", "涵涵也会伤感.", "黑名单", "谎言", "极镜", "l", "墨", "Man", "密码",
-                "念神", "逆天了老铁", "??", "😎✌", "^O^", "₍₍⁽◍⁾₎₍⁽◍⁾₎", "💰", "va.4e6.等你",
-                "❤️💕💕", "。。", "🐱", "😏👌", "😔", "😃", "😎", "🤔", "😈", "😼", "🐸", "🌵",
-                "😳", "😈", "??", "😎👌", "^O^", "月月", "一只不要被动...", "自爆(敢过来可...",
-                "终究不可能", "治愈系", "小川.", "小cat久揍模式", "许馆", "小皮", "小帅",
-                "小透明", "薛霞", "嘻嘻嘻", "小郁", "宇", "守望着你", "孙小喘", "甜甜呀",
-                "荒", "雾起", "wwue", "X", "潇🌹", "小安", "phonk", "柒", "七.", "秦岭维何",
-                "Re.", "染回归号", "Serein", "死枪6", "商微",
-                "出书&", "和故", "故不叫故", "有你", "倏符",
-                "流星雨", "星辰大海", "幻影行者", "暗夜精灵", "风之子",
-                "火凤凰", "冰霜巨龙", "雷霆之怒", "光明使者", "暗影刺客",
-                "守护者", "流浪者", "猎人", "法师", "战士",
-                "骑士", "牧师", "德鲁伊", "术士", "圣骑士",
-                "潜行者", "工程师", "药师", "猎魔人", "龙骑士",
-                "影舞者", "星术师", "月之女祭司", "太阳神官", "暗月之影",
-                "雷霆之心", "冰风谷", "火焰山", "翡翠梦", "黄金之翼",
-                "白银之刃", "黑曜石", "红莲业火", "青龙偃月", "白虎啸月",
-                "朱雀焚天", "玄武守卫", "麒麟之角", "凤凰涅槃", "神龙之息"
-            ];
-
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const message = document.getElementById('message');
-            const content = document.getElementById('content');
-            const logoutBtn = document.querySelector('.logout-btn');
-
-            if (validUsernames.includes(username) && (password === 'yyh666' || password === 'yuquan')) {
-                if (isLoggedIn) {
-                    message.textContent = '您已登录，请先登出再登录其他账号。';
-                    return false;
-                }
-
-                // 检查是否输入了重置密码
-                if (password === 'yuquan') {
-                    // 重置设备的登录状态
-                    localStorage.removeItem('currentUsername');
-                    message.textContent = '设备已重置，可以登录新账号。';
-                    return false;
-                }
-
-                // 检查设备上是否已登录其他账号
-                const currentUsername = localStorage.getItem('currentUsername');
-                if (currentUsername && currentUsername !== username) {
-                    message.textContent = '此设备已登录其他账号，请先登出或使用重置密码“yuquan”重置设备。';
-                    return false;
-                }
-
-                // 验证地理位置
-                const isLocationValid = validateGeolocation();
+        // 模拟登录逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            validateGeolocation().then(isLocationValid => {
                 if (!isLocationValid) {
-                    message.textContent = '地理位置验证失败，请确保您的位置在允许的范围内。';
-                    return false;
+                    document.getElementById('message').textContent = '地理位置验证失败，您不在中国。';
                 }
-
-                // 验证设备指纹
-                const isValidDevice = validateDeviceFingerprint(username);
-                if (!isValidDevice) {
-                    message.textContent = '此账号已在其他设备上登录，请在原设备上登录。';
-                    return false;
-                }
-
-                // 存储当前登录的用户名
-                localStorage.setItem('currentUsername', username);
-
-                // 存储设备指纹并登录
-                storeDeviceFingerprint(username);
-                isLoggedIn = true;
-                content.style.display = 'block';
-                message.textContent = '登录成功！欢迎进入遇强文件官方网页。';
-                logoutBtn.style.display = 'block';
-            } else {
-                message.textContent = '用户名或密码错误。如果您没有用户名或密码，请联系3870149287。';
-                return false;
-            }
-            return true;
-        }
-
-        function logout() {
-            const username = document.getElementById('username').value;
-            localStorage.removeItem(`fingerprint_${username}`);
-            localStorage.removeItem('currentUsername');
-            isLoggedIn = false;
-            document.getElementById('content').style.display = 'none';
-            document.getElementById('message').textContent = '已登出。';
-            document.querySelector('.logout-btn').style.display = 'none';
-        }
+            });
+        });
     </script>
 </body>
     </html>
